@@ -15,6 +15,7 @@
 Ten en cuenta que las respuestas pueden requerir información sobre:
 - **Vistas**
   :smile:
+    ```python
     class SupervisionFachadaView(LoginRequiredMixin, TemplateView):
     template_name = "gestion/supervision_fachada.html"
 
@@ -151,6 +152,7 @@ Ten en cuenta que las respuestas pueden requerir información sobre:
             {% endif %}
         </div>
         {% endblock %}
+    ```
 - 
 - **Referencias a URLs siempre usarán el formato `gestion:nombre_de_la_vista`**
       - Voy a trabajar en este url
