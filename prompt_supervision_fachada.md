@@ -167,8 +167,11 @@ Ten en cuenta que las respuestas pueden requerir información sobre:
 [Escribe aquí tu pregunta] ❓
 
 Quiero editar el html para que el card de generar informe diario no tenga la selección de un proyecto hijo. Sino que simplemente genere un informe diario para el proyecto:  
-Proyecto de Reparación de Fachadas y Aplicación de Pintura 2025  
-Entonces solo es necesario que quede el nombre del card y luego, puede salir un título que diga proyecto con el proyecto: Proyecto de Reparación de Fachadas y Aplicación de Pintura 2025 ya seleccionado.
+Proyecto de Reparación de Fachadas y Aplicación de Pintura 2025 al apretar el boton de generar informe diario.
+Entonces solo quedaria el nombre del card con un boton 
+Al apretar el boton se ejecutaria el 'gestion:informe_diario_create' con la fecha del día actual y el resto de los datos se completarian automatico. Osea que no se mostraría el formulario.
+Pasame los cambios que tengo que hacerle a la vista y al html.
+Crea los codigos completos para que yo solo copie y pegue
 
 ---
 
