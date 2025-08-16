@@ -1,4 +1,4 @@
-# Prompt Base Para Proyecto Django (django_pinehille / gestion)
+# Prompt para Proyecto Django (django_pinehille / gestion)
 
 ## Contexto del Proyecto
 
@@ -175,4 +175,3 @@ Crea los codigos completos para que yo solo copie y pegue
 
 ---
 
-_Este archivo sirve como base para generar prompts sobre el proyecto. Agrega tu pregunta en el espacio correspondiente y especifica si necesitas ejemplos de vistas, modelos, formularios o templates._
