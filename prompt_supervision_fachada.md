@@ -48,6 +48,7 @@ Ten en cuenta que las respuestas pueden requerir información sobre:
 - **Formularios**
 - **Templates**
 -   :simile:
+-   ```html
         {% extends "header_inicio.html" %}
         {% block content %}
         <div class="container mt-4">
