@@ -157,8 +157,9 @@ Ten en cuenta que las respuestas pueden requerir información sobre:
 - 
 - **Referencias a URLs siempre usarán el formato `gestion:nombre_de_la_vista`**
       - Voy a trabajar en este url
+  ''' python 
       path('supervision-fachada/', views.SupervisionFachadaView.as_view(), name='supervision_fachada'),
-
+  '''
 ## Pregunta
 
 
