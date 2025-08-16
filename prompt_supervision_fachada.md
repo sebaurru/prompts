@@ -162,12 +162,11 @@ Ten en cuenta que las respuestas pueden requerir información sobre:
   '''
 ## Pregunta
 
-
-
-
-
 [Escribe aquí tu pregunta]
-
+❓
+Quiero editar el html para que el card de generar informe diario no tenga la selección de un proyecto hijo. Sino que simplemente genere un informe diario para el proyecto:
+Proyecto de Reparación de Fachadas y Aplicación de Pintura 2025
+Entonces solo es necesario que quede el nombre del card y luego, puede salir un tiutol que diga proyecto con el proyecto: Proyecto de Reparación de Fachadas y Aplicación de Pintura 2025 ya seleccionado y al generar el informe diario ejecutte 'gestion:informe_diario_create'
 ---
 
 _Este archivo sirve como base para generar prompts sobre el proyecto. Agrega tu pregunta en el espacio correspondiente y especifica si necesitas ejemplos de vistas, modelos, formularios o templates._
