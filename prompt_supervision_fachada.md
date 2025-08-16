@@ -9,6 +9,7 @@
 - **Ruta de la aplicación:** `django_pinehille/gestion` (cargada en la URL principal con `include`)
 - **Vistas:** Basadas en clases (Class-Based Views)
 - **Namespace de URLs:** Todas las referencias a URLs o vistas deben tener el formato `"gestion:nombre_de_la_vista"`
+- - **URLs:** en lsa url del proyecto cargo los vistas así: from . import views
 
 ## Referencias para respuestas
 
