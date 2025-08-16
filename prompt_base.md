@@ -26,7 +26,14 @@ Ten en cuenta que las respuestas pueden requerir información sobre:
 ```
 
 - **Modelos**
+    ```python
+    
+    ```
 - **Formularios**
+```python
+    
+    ```
+
 - **Templates 1** 😄
 
     ```html
