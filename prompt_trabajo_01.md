@@ -27,6 +27,15 @@ Ten en cuenta que las respuestas pueden requerir información sobre:
 
 - **Modelos**
    ```python
+
+class InformeDiarioActividad(models.Model):
+    informe_diario = models.ForeignKey('InformeDiario', on_delete=models.CASCADE)
+    actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE)
+    descripcion = models.TextField(blank=True)  # Nuevo campo
+    orden = models.PositiveIntegerField(default=0)  # Nuevo campo
+
+    def __str__(self):
+        return f"Informe {self.informe_diario.id} - Actividad {self.actividad.id}"
 class InformeDiario(models.Model):
     CLIMA_CHOICES = [
         ('soleado', 'Soleado'),
@@ -89,22 +98,75 @@ class InformeDiario(models.Model):
 
     def __str__(self):
         return f"Informe Diario {self.fecha_inf} - {self.proyecto}"
+
+class Actividad(models.Model):
+    proyecto = models.ForeignKey(
+        'Proyecto',
+        related_name='activdades_creadas',
+        on_delete=models.CASCADE
+    )
+    actividad = models.CharField(max_length=255)
+    descripcion = models.TextField(blank=True)
+    orden = models.PositiveIntegerField(default=0)
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='actividades_creadas',
+        verbose_name='Usuario que realizó la actividad'
+    )
+    fecha_creado = models.DateTimeField(auto_now_add=True)
+    fecha_update = models.DateTimeField(auto_now=True)
+    fotos = models.ManyToManyField(
+        'Foto',
+        through='ActividadFoto',
+        related_name='actividades',
+        blank=True,
+        verbose_name='Fotos relacionadas'
+    )
+
+    def __str__(self):
+        return f"{self.actividad} ({self.proyecto})"
     ```
 - **Formularios**
 
     ```python
-    
+
+class ActividadForm(forms.ModelForm):
+    class Meta:
+        model = Actividad
+        fields = [
+            "proyecto",
+            "actividad",
+            "descripcion",
+            "orden",
+            "usuario",
+
+        ]
+        widgets = {
+            "descripcion": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if field.widget.__class__.__name__ in ["Select", "SelectMultiple"]:
+                field.widget.attrs["class"] = "form-select"
+            else:
+                field.widget.attrs["class"] = "form-control"
     ```
 
 - **Templates 1** 😄
 
     ```html
-   {% extends "header_inicio.html" %}
+ {% extends "header_inicio.html" %}
 {% block content %}
 <div class="container mt-4">
     <div class="card mb-4">
-        <div class="card-header bg-primary text-white fw-bold">
-            <i class="bi bi-pencil"></i> Editar Actividad del Informe Diario
+        <div class="card-header bg-success text-white fw-bold">
+            <i class="bi bi-pencil"></i> Editar Informe Diario
         </div>
         <div class="card-body">
             {% if form.errors %}
@@ -112,32 +174,118 @@ class InformeDiario(models.Model):
                     {{ form.errors }}
                 </div>
             {% endif %}
-            <form method="post">
+            <form method="post" action="{% url 'gestion:informe_diario_update_2' informe.pk %}">
                 {% csrf_token %}
-                <!-- Mostrar nombre del informe y enviar id oculto -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Informe Diario</label>
-                    <input type="text" class="form-control" value="{{ informe_diario_nombre }}" readonly>
-                    <input type="hidden" name="informe_diario" value="{{ actrel.informe_diario.pk }}">
-                </div>
-                <!-- Mostrar nombre de la actividad y enviar id oculto -->
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Actividad</label>
-                    <input type="text" class="form-control" value="{{ actividad_nombre }}" readonly>
-                    <input type="hidden" name="actividad" value="{{ actrel.actividad.pk }}">
-                </div>
-                <!-- Campos editables -->
-                <div class="mb-3">
-                    <label class="form-label">Descripción</label>
-                    {{ form.descripcion }}
+                    <label class="form-label fw-bold">Proyecto</label>
+                    <!-- Muestra el nombre del proyecto como texto readonly y envía el ID en un campo oculto -->
+                    <input type="text" class="form-control" value="{{ proyecto_nombre }}" readonly>
+                    <input type="hidden" name="proyecto" value="{{ form.proyecto.value }}">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Orden</label>
-                    {{ form.orden }}
+                    <label class="form-label fw-bold">Fecha del informe</label>
+                    {{ form.fecha_inf }}
+                </div>
+                <h5 class="mt-4 fw-bold">Clima</h5>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Clima</label>
+                        <div style="width:100%">
+                            {{ form.clima }}
+                        </div>
+                        <style>
+                          select[name="clima"] { width: 100%; }
+                        </style>
+                    </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Horas sin trabajo por clima</label>
+                    {{ form.hora_sin_trabajo }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Observaciones sobre el clima</label>
+                    {{ form.obs_clima }}
+                </div>
+                <h5 class="mt-4 fw-bold">Asistencia de los Trabajadores</h5>
+                <div class="mb-3">
+                    <label class="form-label">Empleados presentes</label>
+                    {{ form.empl_presentes }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Empleados ausentes</label>
+                    {{ form.empl_ausentes }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Observaciones sobre empleados</label>
+                    {{ form.obs_Empleados }}
+                </div>
+                <h5 class="mt-4 fw-bold">Herramientas</h5>
+                <div class="mb-3">
+                    <label class="form-label">Herramienta que llegan o salen de obra</label>
+                    {{ form.herramienta }}
                 </div>
                 <button type="submit" class="btn btn-success">Guardar cambios</button>
-                <a href="{% url 'gestion:informe_diario_detail' actrel.informe_diario.pk %}" class="btn btn-secondary">Cancelar</a>
+                <a href="{% url 'gestion:supervision_fachada' %}" class="btn btn-secondary">Cancelar</a>
             </form>
+
+            <!-- ACTIVIDADES: Contenedor más interno justo debajo del formulario -->
+            <div class="card mt-5 border-info shadow-sm">
+                <div class="card-header bg-info text-white fw-bold">
+                    <i class="bi bi-list-task"></i> Actividades
+                </div>
+                <div class="card-body">
+                    {% for actrel in actividades_relacionadas %}
+                        <div class="border-top border-2 border-secondary my-3"></div>
+                        <!-- Primera fila: datos de la actividad -->
+                        <div class="row align-items-center mb-0">
+                            <div class="col-md-4">
+                                <strong>Actividad:</strong>
+                                {{ actrel.actividad.actividad }}
+                            </div>
+                            <div class="col-md-5">
+                                <strong>Descripción:</strong>
+                                {{ actrel.descripcion }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Orden:</strong>
+                                {{ actrel.orden }}
+                            </div>
+                        </div>
+                        <!-- Segunda fila: botones de acción -->
+                        <div class="row mb-3" style="margin-top: 6px;">
+                            <div class="col-12 text-end" style="padding-right: 16px;">
+                                <div style="display: inline-flex; gap: 7px;">
+                                    <form method="post" action="{% url 'gestion:informe_diario_actividad_update_V2' actrel.pk %}" style="margin-bottom:0;">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                            class="btn fw-bold"
+                                            style="background-color: #198754; color: white; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </button>
+                                    </form>
+                                    <button type="button"
+                                        class="btn fw-bold"
+                                        style="background-color: #ffc107; color: #212529; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                                        <i class="bi bi-image"></i> Agregar una foto a esta actividad
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted mt-3">No hay actividades registradas para este informe.</p>
+                    {% endfor %}
+
+                    <!-- Card interna para el botón de agregar actividad -->
+                    <div class="card border-light mt-4 mb-2 p-3" style="background-color: #f6f9fc;">
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn fw-bold fs-5 w-100"
+                                style="background-color: #0dcaf0; color: white; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                                <i class="bi bi-plus-circle"></i> Agregar actividad
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Fin actividades -->
         </div>
     </div>
 </div>
@@ -176,8 +324,9 @@ class InformeDiarioForm(forms.ModelForm):
 
 [Escribe aquí tu pregunta] ❓
 
-quiero que el campo clima ocupe el ancho del contenedor
-pero no quiero agregar tweaks
+Aca te actualice el contexto
+Puedes hacer que se habra la pagina para crear la actividad y la tabla relacio
+
 
 
 
